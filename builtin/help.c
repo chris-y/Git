@@ -120,7 +120,9 @@ static void exec_woman_emacs(const char *path, const char *page)
 		if (!path)
 			path = "emacsclient";
 		strbuf_addf(&man_page, "(woman \"%s\")", page);
+#ifndef __amigaos4__
 		execlp(path, "emacsclient", "-e", man_page.buf, (char *)NULL);
+#endif
 		warning("failed to exec '%s': %s", path, strerror(errno));
 	}
 }
@@ -148,7 +150,9 @@ static void exec_man_konqueror(const char *path, const char *page)
 		} else
 			path = "kfmclient";
 		strbuf_addf(&man_page, "man:%s(1)", page);
+#ifndef __amigaos4__
 		execlp(path, filename, "newTab", man_page.buf, (char *)NULL);
+#endif
 		warning("failed to exec '%s': %s", path, strerror(errno));
 	}
 }
@@ -157,7 +161,9 @@ static void exec_man_man(const char *path, const char *page)
 {
 	if (!path)
 		path = "man";
+#ifndef __amigaos4__
 	execlp(path, "man", page, (char *)NULL);
+#endif
 	warning("failed to exec '%s': %s", path, strerror(errno));
 }
 
@@ -165,7 +171,9 @@ static void exec_man_cmd(const char *cmd, const char *page)
 {
 	struct strbuf shell_cmd = STRBUF_INIT;
 	strbuf_addf(&shell_cmd, "%s %s", cmd, page);
+#ifndef __amigaos4__
 	execl("/bin/sh", "sh", "-c", shell_cmd.buf, (char *)NULL);
+#endif
 	warning("failed to exec '%s': %s", cmd, strerror(errno));
 }
 
@@ -372,7 +380,9 @@ static void show_info_page(const char *git_cmd)
 {
 	const char *page = cmd_to_page(git_cmd);
 	setenv("INFOPATH", system_path(GIT_INFO_PATH), 1);
+#ifndef __amigaos4__
 	execlp("info", "info", "gitman", page, (char *)NULL);
+#endif
 	die("no info viewer handled the request");
 }
 

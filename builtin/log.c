@@ -210,6 +210,7 @@ static void early_output(int signal)
 
 static void setup_early_output(struct rev_info *rev)
 {
+#ifndef __amigaos4__
 	struct sigaction sa;
 
 	/*
@@ -224,7 +225,7 @@ static void setup_early_output(struct rev_info *rev)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGALRM, &sa, NULL);
-
+#endif
 	/*
 	 * If we can get the whole output in less than a
 	 * tenth of a second, don't even bother doing the

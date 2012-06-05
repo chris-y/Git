@@ -481,8 +481,9 @@ int cmd_clone(int argc, const char **argv, const char *prefix)
 	 * environment variable.  We actually need to unset it, too, to
 	 * re-enable parsing of the global configs.
 	 */
+#ifndef __amigaos4__
 	unsetenv(CONFIG_ENVIRONMENT);
-
+#endif
 	git_config(git_default_config, NULL);
 
 	if (option_bare) {
