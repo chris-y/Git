@@ -54,6 +54,7 @@ const char * hstrerror(int err);
 int getpagesize();
 int poll(struct pollfd *ufds, unsigned int nfds, int timeout);
 
+#ifndef __amigaos4__
 static inline int select(int nfds, fd_set *readfds, fd_set *writefds,
 	   fd_set *exceptfds, struct timeval *timeout)
 {
@@ -63,6 +64,7 @@ static inline int select(int nfds, fd_set *readfds, fd_set *writefds,
   return waitselect(nfds,readfds,writefds,exceptfds, timeout,0);
 #endif
 }
+#endif
 
 #define is_absolute_path(path) (strchr(path,':') != 0)
 
@@ -97,5 +99,9 @@ void __stack_chk_fail();
 
 #endif
 
+#ifdef __amigaos4__
+int pipe(int fd[2]);
+int execvp(const char *file, char *const argv[]);
+#endif
 
 #endif

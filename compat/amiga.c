@@ -3,6 +3,10 @@
 #include <string.h>
 #include <pthread.h>
 
+#ifdef __amigaos4__
+#include <proto/exec.h>
+#endif
+
 #include "../git-compat-util.h"
 
 void __stack_chk_fail() {}
@@ -399,3 +403,36 @@ pid_t amiga_spawnvpe(const char *cmd, const char **argv, char **env,
 	free_path_split(path);
 	return pid;
 }
+
+#ifdef __amigaos4__
+//CY
+int pipe(int fd[2])
+{
+	char fname[30];
+
+	sprintf(fname, "PIPE:%lx%lx%lx", getpid(), time(NULL),  rand());
+
+	fd[0] = fopen(fname, "r");
+	fd[1] = fopen(fname, "w");
+
+	return 0;
+}
+
+int execvp(const char *file, char *const argv[]) {
+	struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
+
+	printf("execute %s\n", file);
+
+	//SystemTags();
+
+}
+
+// not sure we need these; they are defined in newlib but linker complains
+pid_t waitpid(pid_t pid, int *stat_loc, int options) {
+	return 0;
+}
+
+pid_t getppid(void) {
+	return 0;
+}
+#endif

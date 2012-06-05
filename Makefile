@@ -3,7 +3,7 @@ all::
 
 # Define V=1 to have a more verbose compile.
 #
-# Define SHELL_PATH to a POSIX shell if your /bin/sh is broken.
+# Define SHELL to a POSIX shell if your /bin/sh is broken.
 #
 # Define SANE_TOOL_PATH to a colon-separated list of paths to prepend
 # to PATH if your tools in /usr/bin are broken.
@@ -239,7 +239,7 @@ all::
 # Define NATIVE_CRLF if your platform uses CRLF for line endings.
 
 GIT-VERSION-FILE: FORCE
-	@$(SHELL_PATH) ./GIT-VERSION-GEN
+	@$(SHELL) ./GIT-VERSION-GEN
 -include GIT-VERSION-FILE
 
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
@@ -249,7 +249,7 @@ uname_R := $(shell sh -c 'uname -r 2>/dev/null || echo not')
 uname_P := $(shell sh -c 'uname -p 2>/dev/null || echo not')
 uname_V := $(shell sh -c 'uname -v 2>/dev/null || echo not')
 
-uname_S := AROS
+# uname_S := AROS
 
 ifdef MSVC
 	# avoid the MingW and Cygwin configuration sections
@@ -300,8 +300,8 @@ pathsep = :
 
 export prefix bindir sharedir sysconfdir gitwebdir
 
-CC = i386-linux-aros-gcc
-AR = i386-linux-aros-ar
+CC = gcc
+AR = ar
 RM = rm -f
 DIFF = diff
 TAR = tar
@@ -463,8 +463,8 @@ BINDIR_PROGRAMS_NEED_X += git-shell
 BINDIR_PROGRAMS_NO_X += git-cvsserver
 
 # Set paths to tools early so that they can be used for version tests.
-ifndef SHELL_PATH
-	SHELL_PATH = /bin/sh
+ifndef SHELL
+	SHELL = /bin/sh
 endif
 ifndef PERL_PATH
 	PERL_PATH = /usr/bin/perl
@@ -785,7 +785,7 @@ ifeq ($(uname_S),UnixWare)
 	NEEDS_NSL = YesPlease
 	NEEDS_SSL_WITH_CRYPTO = YesPlease
 	NEEDS_LIBICONV = YesPlease
-	SHELL_PATH = /usr/local/bin/bash
+	SHELL = /usr/local/bin/bash
 	NO_IPV6 = YesPlease
 	NO_HSTRERROR = YesPlease
 	NO_MKSTEMPS = YesPlease
@@ -809,7 +809,7 @@ ifeq ($(uname_S),SCO_SV)
 	NEEDS_NSL = YesPlease
 	NEEDS_SSL_WITH_CRYPTO = YesPlease
 	NEEDS_LIBICONV = YesPlease
-	SHELL_PATH = /usr/bin/bash
+	SHELL = /usr/bin/bash
 	NO_IPV6 = YesPlease
 	NO_HSTRERROR = YesPlease
 	NO_MKSTEMPS = YesPlease
@@ -836,7 +836,7 @@ endif
 ifeq ($(uname_S),SunOS)
 	NEEDS_SOCKET = YesPlease
 	NEEDS_NSL = YesPlease
-	SHELL_PATH = /bin/bash
+	SHELL = /bin/bash
 	SANE_TOOL_PATH = /usr/xpg6/bin:/usr/xpg4/bin
 	NO_STRCASESTR = YesPlease
 	NO_MEMMEM = YesPlease
@@ -986,7 +986,7 @@ ifeq ($(uname_S),IRIX)
 	NO_MMAP = YesPlease
 	NO_REGEX = YesPlease
 	SNPRINTF_RETURNS_BOGUS = YesPlease
-	SHELL_PATH = /usr/gnu/bin/bash
+	SHELL = /usr/gnu/bin/bash
 	NEEDS_LIBGEN = YesPlease
 endif
 ifeq ($(uname_S),IRIX64)
@@ -1005,7 +1005,7 @@ ifeq ($(uname_S),IRIX64)
 	NO_MMAP = YesPlease
 	NO_REGEX = YesPlease
 	SNPRINTF_RETURNS_BOGUS = YesPlease
-	SHELL_PATH=/usr/gnu/bin/bash
+	SHELL=/usr/gnu/bin/bash
 	NEEDS_LIBGEN = YesPlease
 endif
 ifeq ($(uname_S),HP-UX)
@@ -1092,6 +1092,54 @@ else
 	BASIC_CFLAGS += -Zi -MTd
 endif
 	X = .exe
+endif
+# FIXME: Verify which ones of these are actually needed.
+ifeq ($(uname_S),AmigaOS)
+	pathsep = ;
+	NO_PREAD = YesPlease
+	NO_LIBGEN_H = YesPlease
+	NO_SYMLINK_HEAD = YesPlease
+	NO_IPV6 = YesPlease
+	NO_SETENV = YesPlease
+#	NO_UNSETENV = YesPlease
+	NO_STRCASESTR = YesPlease
+	NO_STRLCPY = YesPlease
+	NO_MEMMEM = YesPlease
+	# NEEDS_LIBICONV = YesPlease
+	NO_ICONV = YesPlease
+	NO_C99_FORMAT = YesPlease
+	NO_STRTOUMAX = YesPlease
+	NO_STRTOULL = YesPlease
+	NO_STRTOK_R = YesPlease
+	NO_MKDTEMP = YesPlease
+	NO_MKSTEMPS = YesPlease
+	SNPRINTF_RETURNS_BOGUS = YesPlease
+	NO_SVN_TESTS = YesPlease
+	NO_PERL_MAKEMAKER = YesPlease
+	#RUNTIME_PREFIX = YesPlease
+	NO_POSIX_ONLY_PROGRAMS = YesPlease
+	NO_ST_BLOCKS_IN_STRUCT_STAT = YesPlease
+	NO_NSEC = YesPlease
+	NO_MMAP = YesPlease
+	# USE_NED_ALLOCATOR = YesPlease
+	UNRELIABLE_FSTAT = UnfortunatelyYes
+	OBJECT_CREATION_USES_RENAMES = UnfortunatelyNeedsTo
+	#NO_REGEX = YesPlease
+	#NO_CURL = YesPlease
+	NO_PYTHON = YesPlease
+	BLK_SHA1 = YesPlease
+	# NO_PTHREADS = YesPlease
+	# NO_OPENSSL = YesPlease
+	NO_SYS_SELECT_H = YesPlease
+	NO_TCLTK = YesPlease
+	NEEDS_CRYPTO_WITH_SSL = YesPlease
+	CFLAGS=-D__USE_INLINE__ -D__BSD_VISIBLE
+	COMPAT_OBJS += compat/fnmatch/fnmatch.o compat/amiga.o
+	ALL_LDFLAGS += #-laros -larosc
+	# For some reason the order is vital here for AROS:
+	EXTLIBS += -lcurl -lssl -lcrypto -lregex -lrtmp -lssl
+	COMPAT_CFLAGS = -DHAVE_STRING_H -DHAVE_ALLOCA_H -Icompat -Icompat/fnmatch -Icompat/regex -Icompat/fnmatch
+	lib =
 endif
 # FIXME: Verify which ones of these are actually needed.
 ifeq ($(uname_S),AROS)
@@ -1582,7 +1630,7 @@ htmldir_SQ = $(subst ','\'',$(htmldir))
 prefix_SQ = $(subst ','\'',$(prefix))
 gitwebdir_SQ = $(subst ','\'',$(gitwebdir))
 
-SHELL_PATH_SQ = $(subst ','\'',$(SHELL_PATH))
+SHELL_SQ = $(subst ','\'',$(SHELL))
 PERL_PATH_SQ = $(subst ','\'',$(PERL_PATH))
 PYTHON_PATH_SQ = $(subst ','\'',$(PYTHON_PATH))
 TCLTK_PATH_SQ = $(subst ','\'',$(TCLTK_PATH))
@@ -1613,12 +1661,12 @@ endif
 ALL_CFLAGS += $(BASIC_CFLAGS)
 ALL_LDFLAGS += $(BASIC_LDFLAGS)
 
-export DIFF TAR INSTALL DESTDIR SHELL_PATH
+export DIFF TAR INSTALL DESTDIR SHELL
 
 
 ### Build rules
 
-SHELL = $(SHELL_PATH)
+#SHELL = $(SHELL)
 
 all:: shell_compatibility_test $(ALL_PROGRAMS) $(SCRIPT_LIB) $(BUILT_INS) $(OTHER_PROGRAMS) GIT-BUILD-OPTIONS
 ifneq (,$X)
@@ -1636,12 +1684,12 @@ endif
 ifndef NO_PYTHON
 	$(QUIET_SUBDIR0)git_remote_helpers $(QUIET_SUBDIR1) PYTHON_PATH='$(PYTHON_PATH_SQ)' prefix='$(prefix_SQ)' all
 endif
-	$(QUIET_SUBDIR0)templates $(QUIET_SUBDIR1) SHELL_PATH='$(SHELL_PATH_SQ)' PERL_PATH='$(PERL_PATH_SQ)'
+	$(QUIET_SUBDIR0)templates $(QUIET_SUBDIR1) SHELL='$(SHELL_SQ)' PERL_PATH='$(PERL_PATH_SQ)'
 
-please_set_SHELL_PATH_to_a_more_modern_shell:
+please_set_SHELL_to_a_more_modern_shell:
 	@$$(:)
 
-shell_compatibility_test: please_set_SHELL_PATH_to_a_more_modern_shell
+shell_compatibility_test: please_set_SHELL_to_a_more_modern_shell
 
 strip: $(PROGRAMS) git$X
 	$(STRIP) $(STRIP_OPTS) $(PROGRAMS) git$X
@@ -1673,8 +1721,8 @@ common-cmds.h: $(wildcard Documentation/git-*.txt)
 
 define cmd_munge_script
 $(RM) $@ $@+ && \
-sed -e '1s|#!.*/sh|#!$(SHELL_PATH_SQ)|' \
-    -e 's|@SHELL_PATH@|$(SHELL_PATH_SQ)|' \
+sed -e '1s|#!.*/sh|#!$(SHELL_SQ)|' \
+    -e 's|@SHELL@|$(SHELL_SQ)|' \
     -e 's|@@DIFF@@|$(DIFF_SQ)|' \
     -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g' \
     -e 's/@@NO_CURL@@/$(NO_CURL)/g' \
@@ -1745,7 +1793,7 @@ endif # CSSMIN
 
 git-instaweb: git-instaweb.sh gitweb/gitweb.cgi gitweb/static/gitweb.css gitweb/static/gitweb.js
 	$(QUIET_GEN)$(RM) $@ $@+ && \
-	sed -e '1s|#!.*/sh|#!$(SHELL_PATH_SQ)|' \
+	sed -e '1s|#!.*/sh|#!$(SHELL_SQ)|' \
 	    -e 's/@@GIT_VERSION@@/$(GIT_VERSION)/g' \
 	    -e 's/@@NO_CURL@@/$(NO_CURL)/g' \
 	    -e 's|@@GITWEBDIR@@|$(gitwebdir_SQ)|g' \
@@ -1756,7 +1804,7 @@ git-instaweb: git-instaweb.sh gitweb/gitweb.cgi gitweb/static/gitweb.css gitweb/
 else # NO_PERL
 $(patsubst %.perl,%,$(SCRIPT_PERL)) git-instaweb: % : unimplemented.sh
 	$(QUIET_GEN)$(RM) $@ $@+ && \
-	sed -e '1s|#!.*/sh|#!$(SHELL_PATH_SQ)|' \
+	sed -e '1s|#!.*/sh|#!$(SHELL_SQ)|' \
 	    -e 's|@@REASON@@|NO_PERL=$(NO_PERL)|g' \
 	    unimplemented.sh >$@+ && \
 	chmod +x $@+ && \
@@ -1779,7 +1827,7 @@ $(patsubst %.py,%,$(SCRIPT_PYTHON)): % : %.py
 else # NO_PYTHON
 $(patsubst %.py,%,$(SCRIPT_PYTHON)): % : unimplemented.sh
 	$(QUIET_GEN)$(RM) $@ $@+ && \
-	sed -e '1s|#!.*/sh|#!$(SHELL_PATH_SQ)|' \
+	sed -e '1s|#!.*/sh|#!$(SHELL_SQ)|' \
 	    -e 's|@@REASON@@|NO_PYTHON=$(NO_PYTHON)|g' \
 	    unimplemented.sh >$@+ && \
 	chmod +x $@+ && \
@@ -2038,7 +2086,7 @@ GIT-CFLAGS: FORCE
 # that runs GIT-BUILD-OPTIONS, and then again to protect it
 # and the first level quoting from the shell that runs "echo".
 GIT-BUILD-OPTIONS: FORCE
-	@echo SHELL_PATH=\''$(subst ','\'',$(SHELL_PATH_SQ))'\' >$@
+	@echo SHELL=\''$(subst ','\'',$(SHELL_SQ))'\' >$@
 	@echo PERL_PATH=\''$(subst ','\'',$(PERL_PATH_SQ))'\' >>$@
 	@echo DIFF=\''$(subst ','\'',$(subst ','\'',$(DIFF)))'\' >>$@
 	@echo PYTHON_PATH=\''$(subst ','\'',$(PYTHON_PATH_SQ))'\' >>$@
@@ -2071,7 +2119,7 @@ all:: $(TEST_PROGRAMS) $(test_bindir_programs)
 
 bin-wrappers/%: wrap-for-bin.sh
 	@mkdir -p bin-wrappers
-	$(QUIET_GEN)sed -e '1s|#!.*/sh|#!$(SHELL_PATH_SQ)|' \
+	$(QUIET_GEN)sed -e '1s|#!.*/sh|#!$(SHELL_SQ)|' \
 	     -e 's|@@BUILD_DIR@@|$(shell pwd)|' \
 	     -e 's|@@PROG@@|$(@F)|' < $< > $@ && \
 	chmod +x $@
@@ -2308,7 +2356,7 @@ endif
 	$(RM) GIT-VERSION-FILE GIT-CFLAGS GIT-GUI-VARS GIT-BUILD-OPTIONS
 
 .PHONY: all install clean strip
-.PHONY: shell_compatibility_test please_set_SHELL_PATH_to_a_more_modern_shell
+.PHONY: shell_compatibility_test please_set_SHELL_to_a_more_modern_shell
 .PHONY: FORCE TAGS tags cscope
 
 ### Check documentation

@@ -44,17 +44,20 @@ static void progress_interval(int signum)
 
 static void set_progress_signal(void)
 {
+#ifndef __amigaos4__
 	struct sigaction sa;
+#endif
 	struct itimerval v;
 
 	progress_update = 0;
 
+#ifndef __amigaos4__
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = progress_interval;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGALRM, &sa, NULL);
-
+#endif
 	v.it_interval.tv_sec = 1;
 	v.it_interval.tv_usec = 0;
 	v.it_value = v.it_interval;
