@@ -127,7 +127,10 @@ static char *lookup_prog(const char *dir, const char *cmd, int isexe, int exe_on
 #warning FIXME: lookup_prog
 #define MAX_PATH 256
 	char path[MAX_PATH];
-	snprintf(path, sizeof(path), "%s%s", dir, cmd);
+/* TODO: handle AmigaOS-style paths; using colons as separators
+ * when the path can contain a colon is a problem.
+ * The / should perhaps be appended in path_split function */
+	snprintf(path, sizeof(path), "%s/%s", dir, cmd);
 	fprintf(stderr,"Trying %s\n",path);
 	if (access(path, F_OK) == 0) 
 	  return xstrdup(path);
@@ -227,6 +230,7 @@ static char **get_path_split(void)
 	i = 1;
 	do {
 	  if (*p) {
+		if(*p == '/') p++; /* jump past the first slash */
 		char * tmp = strchr(p,'/');
 		/* FIXME: This doesn't handle just a volume - for that we need to allocate a separate string */
 		if (tmp) *tmp = ':'; /* Volume comes first in Amiga path name */

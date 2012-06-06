@@ -9,7 +9,11 @@
 #include "parse-options.h"
 
 #ifndef DEFAULT_GIT_TEMPLATE_DIR
+#ifndef AMIGA
 #define DEFAULT_GIT_TEMPLATE_DIR "/usr/share/git-core/templates"
+#else
+#define DEFAULT_GIT_TEMPLATE_DIR "PROGDIR:templates"
+#endif
 #endif
 
 #ifdef NO_TRUSTABLE_FILEMODE
